@@ -1,0 +1,28 @@
+network:
+  version: 2
+  ethernets:
+    bond-slave-1:
+      match:
+        macaddress: "{{ slave1_mac }}"
+      set-name: bond-slave-1
+    bond-slave-2:
+      match:
+        macaddress: "{{ slave2_mac }}"
+      set-name: bond-slave-2
+{% if office1_mac is defined %}
+    office1:
+      match:
+        macaddress: "{{ office1_mac }}"
+      set-name: office1
+      addresses:
+        - 192.168.255.9/30
+{% endif %}
+  bonds:
+    bond0:
+      interfaces: [bond-slave-1, bond-slave-2]
+      addresses:
+        - {{ bond_ip }}/30
+      parameters:
+        mode: active-backup
+        mii-monitor-interval: 100
+        fail-over-mac-policy: active

@@ -1,0 +1,13 @@
+etwork:
+  version: 2
+  ethernets:
+    testlan:
+      match:
+        macaddress: "{{ vlan_interface_mac }}"
+      set-name: testlan
+  vlans:
+    vlan{{ vlan_id }}:
+      id: {{ vlan_id }}
+      link: testlan
+      addresses:
+        - {{ vlan_ip }}/24

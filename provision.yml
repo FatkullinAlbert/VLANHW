@@ -1,0 +1,44 @@
+---
+- name: Base set up
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install software on Ubuntu
+      apt:
+        name:
+          - vim
+          - traceroute
+          - tcpdump
+          - net-tools
+        state: present
+        update_cache: true
+
+- name: Set up bond on routers
+  hosts: inetRouter,centralRouter
+  become: yes
+  tasks:
+    - name: Create bond netplan configuration
+      template:
+        src: templates/bond-netplan.j2
+        dest: /etc/netplan/01-bond.yaml
+        owner: root
+        group: root
+        mode: 0644
+    - name: Reboot to apply bond settings
+      reboot:
+        reboot_timeout: 600
+
+- name: Set up VLANs on test hosts
+  hosts: testClient1,testServer1,testClient2,testServer2
+  become: yes
+  tasks:
+    - name: Create VLAN netplan configuration
+      template:
+        src: templates/vlan-netplan.j2
+        dest: /etc/netplan/01-vlan.yaml
+        owner: root
+        group: root
+        mode: 0644
+    - name: Reboot to apply VLAN settings
+      reboot:
+        reboot_timeout: 600
